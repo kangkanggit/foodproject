@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>登录页面</title>
+
+  <!-- Custom fonts for this template-->
+  <link href="/static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link href="/static/css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<body class="bg-gradient-primary">
+
+  <div class="container">
+
+    <div class="card o-hidden border-0 shadow-lg my-5">
+      <div class="card-body p-0">
+        <!-- Nested Row within Card Body -->
+        <div class="row">
+          <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+          <div class="col-lg-6">
+            <div class="p-5">
+              <div class="text-center">
+                <h1 class="h4 text-gray-900 mb-4">登录页面</h1>
+              </div>
+              <form class="user" method="post" >
+              {% csrf_token %}
+                <div class="form-group">
+                  <input type="text" class="form-control form-control-user" id="username" name="username" placeholder="输入用户名">
+                    <span id="result" style="color: red"></span>
+                </div>
+                <div class="form-group">
+                  <input type="password" class="form-control form-control-user"  id="password" name="password" placeholder="输入密码">
+                </div>
+                 <div class="form-group" style="height: 48px;">
+                        <span id="id_content" style="color: red"></span>
+                        <div id="id_verification" class="btn btn-dark " style="float:left;font-size: 24px;text-align: center;color: hotpink;width: 140px;border-radius:20px"></div>
+                        <div style="float: left;margin-left: 12px;"><input  type="text" style="width: 190px;" class="form-control form-control-user" name="verifcationcode" id="id_verificationcode" placeholder="验证码"></div>
+
+                 </div>
+                <div class="form-group">
+                  <input  type="submit" class="btn btn-primary btn-user btn-block" id="id_submit" value="登录" >
+                </div>
+              </form>
+              <hr>
+              <div class="text-center">
+                <a class="small" href="forgot-password.html">忘记密码</a>
+              </div>
+              <div class="text-center">
+                <a class="small" href="/Foods/register/">没有账户，去注册</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap core JavaScript-->
+  <script src="/static/vendor/jquery/jquery.min.js"></script>
+  <script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="/static/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="/static/js/sb-admin-2.min.js"></script>
+  <script src="/static/js/jquery.min.js"></script>
+  <script>
+      var code;
+      //产生验证码
+      getVerification();
+      function getVerification() {
+          code = "";
+          var codeLength = 4;  //验证码长度
+          var random = new Array(0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R',
+	 'S','T','U','V','W','X','Y','Z'); //随机数
+
+          for(var i = 0; i < codeLength; i++){
+              // 随机生成下标
+              var index = Math.floor(Math.random()*36); //获取随机数的索引(0-35)
+              code += random[index];
+          }
+          // 把code赋值给验证码
+          $("#id_verification").text(code);
+          //ajax的前端账号密码验证和验证码的验证
+            $('#id_verificationcode').blur(
+                function () {
+                    var deco = $('#id_verificationcode').val();
+                    console.log(deco);
+                    var url = '/Foods/ajax_yz?deco='+ deco + '&deco1='+ code;
+                    $.ajax(
+                        {
+                            url:url,
+                            type:'get',
+                            data:'',
+                            success:function (data) {
+                                var content = data.content;
+                                if(content == '验证码正确'){
+                                    console.log(deco);
+                                }else {
+                                    $('#id_content').text(content)
+                                }
+                                var s = data.status;
+                                if(s == 'error'){
+                                    $('#id_submit').attr('disabled',true);
+                                }else {
+                                    $('#id_submit').attr('disabled',false);
+                                }
+                            },
+                            error:function (error) {
+                                console.log(error)
+                            }
+                        }
+                    )
+                }
+            )
+      }
+  </script>
+ <script>
+      //ajax_的前端效验
+        $('#password').blur(
+        function () {
+          var value = $('#username').val();
+          var pas = $('#password').val();
+          console.log(value);
+          var url = '/Foods/q_ajax/?username='+value + '&pas=' + pas;
+          $.ajax(
+          {
+            url:url,
+            type:'get',
+            data:'',
+            success:function (data) {
+              var content = data.content;
+              if(content == 'ok'){
+                  console.log('ok');
+              }else {
+                  $('#result').css('color', 'red');
+                  $('#result').text(content);
+              }
+              console.log(data.content)
+            },
+            error:function (error) {
+              console.log(error)
+            }
+          }
+      )
+
+    }
+);
+  </script>
+
+</body>
+
+</html>
